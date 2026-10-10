@@ -326,7 +326,7 @@
 
         /* PRODUCTO */
         .product-box {
-         Se background: var(--primary-soft);
+            background: var(--primary-soft);
             border: 2px solid #bfdbfe;
             border-radius: 12px;
             padding: 18px;
@@ -732,7 +732,7 @@
             </p>
             <div class="tracking-box" role="search">
                 <div class="tracking-input-wrapper">
-                    <input type="text" id="trackingInput" class="tracking-input" placeholder="Ej: NV-1540942" aria-label="Número de seguimiento" autocomplete="off" onkeydown="evaluarEnter(event)">
+                    <input type="text" id="trackingInput" class="tracking-input" placeholder="Ej: NV-154094" aria-label="Número de seguimiento" autocomplete="off" onkeydown="evaluarEnter(event)">
                 </div>
                 <button type="button" class="tracking-btn" onclick="buscarEnvio()">Rastrear envío</button>
             </div>
@@ -913,9 +913,9 @@
 
     <!-- JAVASCRIPT -->
     <script>
-        // BASE DE DATOS DE ENVÍOS
+        // BASE DE DATOS DE ENVÍOS (Códigos de 6 dígitos)
         const envios = {
-            "NV-8158881": {
+            "NV-815888": {
                 comprador: "Cardenas Andrea Pamela",
                 destino: "Venezuela 2163",
                 provincia: "CABA, Buenos Aires",
@@ -927,7 +927,7 @@
                 etapa: 1,
                 fecha: "11/09/2026"
             },
-            "NV-4957982": {
+            "NV-495798": {
                 comprador: "Rauch Roxana Elizabeth",
                 destino: "Parana 1301",
                 provincia: "Buenos Aires (Morón)",
@@ -939,7 +939,7 @@
                 etapa: 7,
                 fecha: "14/09/2026"
             },
-            "NV-7243148": {
+            "NV-724314": {
                 comprador: "Gonzales Matias Joel",
                 destino: "Medici 4459",
                 provincia: "Santa Fe (Rosario)",
@@ -977,9 +977,10 @@
 
             errorMessage.style.display = "none";
 
-            const formatoTracking = /^NV-\d{7}$/;
+            // Expresión regular para exactamente NV- seguido de 6 dígitos numéricos
+            const formatoTracking = /^NV-\d{6}$/;
             if (!formatoTracking.test(input)) {
-                errorMessage.innerText = "⚠️ Por favor ingresá un código válido con formato NV- seguido de 7 números (Ej: NV-1540942).";
+                errorMessage.innerText = "⚠️ Por favor ingresá un código válido con formato NV- seguido de 6 números (Ej: NV-154094).";
                 errorMessage.style.display = "block";
                 resultCard.classList.remove("active");
                 return;
