@@ -717,6 +717,7 @@
     <!-- NAVBAR -->
     <nav class="navbar" role="navigation" aria-label="Navegación principal">
         <div class="navbar-brand" onclick="irA('seguimiento')">
+            <!-- LOGO SVG INTEGRADO (OPCIÓN 1) -->
             <svg class="navbar-logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect width="100" height="100" rx="22" fill="#2563EB"/>
                 <path d="M25 75V25L55 60V25" stroke="white" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
@@ -908,7 +909,7 @@
 
     <!-- JAVASCRIPT -->
     <script>
-        // BASE DE DATOS DE ENVÍOS
+        // BASE DE DATOS DE ENVÍOS CON CÓDIGOS DE 6 DÍGITOS Y ETAPAS ACTUALIZADAS (0 a 6)
         const envios = {
             "NV-815888": {
                 comprador: "Cardenas Andrea Pamela",
@@ -925,4 +926,146 @@
             "NV-495798": {
                 comprador: "Rauch Roxana Elizabeth",
                 destino: "Parana 1301",
-                provincia: "Buenos Aires
+                provincia: "Buenos Aires (Morón)",
+                cp: "1708",
+                demora: "24 a 48 hs",
+                envio: "$12.500",
+                total: "$530.500",
+                producto: "Smart TV TCL 40' (Cant: 1)",
+                etapa: 5,
+                fecha: "14/09/2026"
+            },
+            "NV-724314": {
+                comprador: "Gonzales Matias Joel",
+                destino: "Medici 4459",
+                provincia: "Santa Fe (Rosario)",
+                cp: "2000",
+                demora: "3 a 6 Días",
+                envio: "$18.500",
+                total: "$1.228.900",
+                producto: "Samsung Galaxy S24 FE 256GB (Cant: 1)",
+                etapa: 1,
+                fecha: "10/09/2026"
+            }
+        };
+
+        function irA(id) {
+            const elemento = document.getElementById(id);
+            if (elemento) {
+                elemento.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function evaluarEnter(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                buscarEnvio();
+            }
+        }
+
+        function buscarEnvio() {
+            const inputElement = document.getElementById("trackingInput");
+            const resultCard = document.getElementById("resultCard");
+            const errorMessage = document.getElementById("errorMessage");
+            let input = inputElement.value.trim().toUpperCase();
+
+            errorMessage.style.display = "none";
+
+            // Permite ingresar opcionalmente solo los 6 dígitos o la cadena completa NV-XXXXXX
+            if (/^\d{6}$/.test(input)) {
+                input = "NV-" + input;
+            }
+
+            const formatoTracking = /^NV-\d{6}$/;
+            if (!formatoTracking.test(input)) {
+                errorMessage.innerText = "⚠️ Por favor ingresá un código válido de 6 dígitos (Ej: 154094 o NV-154094).";
+                errorMessage.style.display = "block";
+                resultCard.classList.remove("active"); 
+                return;
+            }
+
+            if (!envios[input]) {
+                envios[input] = {
+                    comprador: "Pendiente de actualización",
+                    destino: "Pendiente de actualización",
+                    provincia: "Pendiente",
+                    cp: "----",
+                    demora: "A calcular",
+                    envio: "A calcular",
+                    total: "A calcular",
+                    producto: "Pedido registrado - En espera de procesamiento",
+                    etapa: 0,
+                    fecha: new Date().toLocaleDateString('es-AR')
+                };
+            }
+
+            const envio = envios[input];
+
+            document.getElementById("resultCode").innerText = input;
+            document.getElementById("resultComprador").innerText = envio.comprador;
+            document.getElementById("resultDestino").innerText = envio.destino;
+            document.getElementById("resultProvincia").innerText = envio.provincia;
+            document.getElementById("resultCP").innerText = envio.cp;
+            document.getElementById("resultDemora").innerText = envio.demora;
+            document.getElementById("resultEnvio").innerText = envio.envio;
+            document.getElementById("resultTotal").innerText = envio.total;
+            document.getElementById("resultProducto").innerText = envio.producto;
+            document.getElementById("resultFecha").innerText = envio.fecha;
+
+            const etapas = document.querySelectorAll(".timeline-item");
+            const iconos = ["🕒", "💳", "📋", "🏭", "🚚", "🏠", "✓"];
+            const totalEtapas = etapas.length; // 7 etapas
+
+            etapas.forEach((etapa, index) => {
+                etapa.classList.remove("completed", "active", "delivered");
+                etapa.querySelector(".timeline-icon").innerText = iconos[index];
+                etapa.querySelector(".timeline-date").innerText = "Pendiente";
+            });
+
+            let numeroEtapa = Number(envio.etapa);
+            if (isNaN(numeroEtapa)) numeroEtapa = 0;
+            numeroEtapa = Math.max(0, Math.min(numeroEtapa, totalEtapas - 1));
+
+            etapas.forEach((etapa, index) => {
+                const fecha = etapa.querySelector(".timeline-date");
+                const icono = etapa.querySelector(".timeline-icon");
+
+                if (index < numeroEtapa) {
+                    etapa.classList.add("completed");
+                    fecha.innerText = "Completado";
+                    icono.innerText = "✓";
+                } else if (index === numeroEtapa) {
+                    etapa.classList.add("active");
+                    fecha.innerText = "En curso (" + envio.fecha + ")";
+                }
+            });
+
+            const status = document.getElementById("resultStatus");
+            if (numeroEtapa >= totalEtapas - 1) {
+                etapas.forEach((etapa) => {
+                    etapa.classList.remove("active");
+                    etapa.classList.add("completed");
+                    etapa.querySelector(".timeline-date").innerText = "Completado";
+                });
+                const ultimaEtapaIndex = totalEtapas - 1;
+                etapas[ultimaEtapaIndex].classList.add("delivered");
+                etapas[ultimaEtapaIndex].querySelector(".timeline-date").innerText = "Entregado el " + envio.fecha;
+
+                status.innerText = "Entregado con éxito";
+                status.style.backgroundColor = "var(--primary-color)";
+            } else {
+                const nombreEtapa = etapas[numeroEtapa].querySelector("h4").innerText;
+                status.innerText = nombreEtapa;
+                status.style.backgroundColor = "var(--success-color)";
+            }
+
+            resultCard.classList.add("active");
+            setTimeout(() => {
+                resultCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            }, 100);
+        }
+    </script>
+</body>
+
+</html>
+
