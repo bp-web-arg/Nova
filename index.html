@@ -64,7 +64,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            padding: 14px 24px;
+            padding: 12px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -73,15 +73,21 @@
         }
 
         .navbar-brand {
-            font-size: 1.3rem;
+            font-size: 1.5rem;
             font-weight: 900;
             letter-spacing: -0.5px;
             color: var(--primary-color);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             text-decoration: none;
             cursor: pointer;
+        }
+
+        .navbar-logo-svg {
+            width: 36px;
+            height: 36px;
+            display: block;
         }
 
         .nav-links {
@@ -711,7 +717,12 @@
     <!-- NAVBAR -->
     <nav class="navbar" role="navigation" aria-label="Navegación principal">
         <div class="navbar-brand" onclick="irA('seguimiento')">
-            <span>📦</span> Nova
+            <svg class="navbar-logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100" height="100" rx="22" fill="#2563EB"/>
+                <path d="M25 75V25L55 60V25" stroke="white" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M75 25L50 50M75 25H55M75 25V45" stroke="#F97316" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Nova
         </div>
         <div class="nav-links">
             <a href="#seguimiento">Seguimiento</a>
@@ -769,7 +780,7 @@
                 <div class="product-name" id="resultProducto">--</div>
             </div>
 
-            <!-- LÍNEA DE TIEMPO (TIMELINE) -->
+            <!-- LÍNEA DE TIEMPO (TIMELINE DE 7 ETAPAS) -->
             <h3 class="timeline-title">Historial del envío</h3>
             <div class="tracking-timeline" id="trackingTimeline">
                 <div class="timeline-item">
@@ -777,14 +788,6 @@
                     <div class="timeline-content">
                         <h4>En espera a cargar su pedido al sistema</h4>
                         <p>El código fue ingresado y aguarda el registro oficial en la plataforma.</p>
-                        <span class="timeline-date">Pendiente</span>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-icon">✓</div>
-                    <div class="timeline-content">
-                        <h4>Pedido recibido</h4>
-                        <p>La solicitud fue registrada correctamente en nuestro sistema.</p>
                         <span class="timeline-date">Pendiente</span>
                     </div>
                 </div>
@@ -809,14 +812,6 @@
                     <div class="timeline-content">
                         <h4>Preparación del envío</h4>
                         <p>El pedido se encuentra en proceso de preparación y acondicionamiento.</p>
-                        <span class="timeline-date">Pendiente</span>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-icon">📦</div>
-                    <div class="timeline-content">
-                        <h4>Envío despachado</h4>
-                        <p>El paquete fue entregado al área de distribución para iniciar su recorrido.</p>
                         <span class="timeline-date">Pendiente</span>
                     </div>
                 </div>
@@ -913,7 +908,7 @@
 
     <!-- JAVASCRIPT -->
     <script>
-        // BASE DE DATOS DE ENVÍOS (Códigos de 6 dígitos)
+        // BASE DE DATOS DE ENVÍOS
         const envios = {
             "NV-815888": {
                 comprador: "Cardenas Andrea Pamela",
@@ -930,142 +925,6 @@
             "NV-495798": {
                 comprador: "Rauch Roxana Elizabeth",
                 destino: "Parana 1301",
-                provincia: "Buenos Aires (Morón)",
-                cp: "1708",
-                demora: "24 a 48 hs",
-                envio: "$12.500",
-                total: "$530.500",
-                producto: "Smart TV TCL 40' (Cant: 1)",
-                etapa: 7,
-                fecha: "14/09/2026"
-            },
-            "NV-724314": {
-                comprador: "Gonzales Matias Joel",
-                destino: "Medici 4459",
-                provincia: "Santa Fe (Rosario)",
-                cp: "2000",
-                demora: "3 a 6 Días",
-                envio: "$18.500",
-                total: "$1.228.900",
-                producto: "Samsung Galaxy S24 FE 256GB (Cant: 1)",
-                etapa: 1,
-                fecha: "10/09/2026"
-            }
-        };
+                provincia: "Buenos Aires
 
-        // Función para desplazamiento suave interno sin recargar
-        function irA(id) {
-            const elemento = document.getElementById(id);
-            if (elemento) {
-                elemento.scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-
-        // Manejo de la tecla Enter
-        function evaluarEnter(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                buscarEnvio();
-            }
-        }
-
-        function buscarEnvio() {
-            const inputElement = document.getElementById("trackingInput");
-            const resultCard = document.getElementById("resultCard");
-            const errorMessage = document.getElementById("errorMessage");
-            const input = inputElement.value.trim().toUpperCase();
-
-            errorMessage.style.display = "none";
-
-            // Expresión regular para exactamente NV- seguido de 6 dígitos numéricos
-            const formatoTracking = /^NV-\d{6}$/;
-            if (!formatoTracking.test(input)) {
-                errorMessage.innerText = "⚠️ Por favor ingresá un código válido con formato NV- seguido de 6 números (Ej: NV-154094).";
-                errorMessage.style.display = "block";
-                resultCard.classList.remove("active");
-                return;
-            }
-
-            if (!envios[input]) {
-                envios[input] = {
-                    comprador: "Pendiente de actualización",
-                    destino: "Pendiente de actualización",
-                    provincia: "Pendiente",
-                    cp: "----",
-                    demora: "A calcular",
-                    envio: "A calcular",
-                    total: "A calcular",
-                    producto: "Pedido registrado - En espera de procesamiento",
-                    etapa: 0,
-                    fecha: new Date().toLocaleDateString('es-AR')
-                };
-            }
-
-            const envio = envios[input];
-
-            document.getElementById("resultCode").innerText = input;
-            document.getElementById("resultComprador").innerText = envio.comprador;
-            document.getElementById("resultDestino").innerText = envio.destino;
-            document.getElementById("resultProvincia").innerText = envio.provincia;
-            document.getElementById("resultCP").innerText = envio.cp;
-            document.getElementById("resultDemora").innerText = envio.demora;
-            document.getElementById("resultEnvio").innerText = envio.envio;
-            document.getElementById("resultTotal").innerText = envio.total;
-            document.getElementById("resultProducto").innerText = envio.producto;
-            document.getElementById("resultFecha").innerText = envio.fecha;
-
-            const etapas = document.querySelectorAll(".timeline-item");
-            const iconos = ["🕒", "✓", "💳", "📋", "🏭", "📦", "🚚", "🏠", "✓"];
-
-            etapas.forEach((etapa, index) => {
-                etapa.classList.remove("completed", "active", "delivered");
-                etapa.querySelector(".timeline-icon").innerText = iconos[index];
-                etapa.querySelector(".timeline-date").innerText = "Pendiente";
-            });
-
-            let numeroEtapa = Number(envio.etapa);
-            if (isNaN(numeroEtapa)) numeroEtapa = 0;
-            numeroEtapa = Math.max(0, Math.min(numeroEtapa, 8));
-
-            etapas.forEach((etapa, index) => {
-                const fecha = etapa.querySelector(".timeline-date");
-                const icono = etapa.querySelector(".timeline-icon");
-
-                if (index < numeroEtapa) {
-                    etapa.classList.add("completed");
-                    fecha.innerText = "Completado";
-                    icono.innerText = "✓";
-                } else if (index === numeroEtapa) {
-                    etapa.classList.add("active");
-                    fecha.innerText = "En curso (" + envio.fecha + ")";
-                }
-            });
-
-            const status = document.getElementById("resultStatus");
-            if (numeroEtapa >= 8) {
-                etapas.forEach((etapa) => {
-                    etapa.classList.remove("active");
-                    etapa.classList.add("completed");
-                    etapa.querySelector(".timeline-date").innerText = "Completado";
-                });
-                etapas[8].classList.add("delivered");
-                etapas[8].querySelector(".timeline-date").innerText = "Entregado el " + envio.fecha;
-
-                status.innerText = "Entregado con éxito";
-                status.style.backgroundColor = "var(--primary-color)";
-            } else {
-                const nombreEtapa = etapas[numeroEtapa].querySelector("h4").innerText;
-                status.innerText = nombreEtapa;
-                status.style.backgroundColor = "var(--success-color)";
-            }
-
-            resultCard.classList.add("active");
-            setTimeout(() => {
-                resultCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
-            }, 100);
-        }
-    </script>
-</body>
-
-</html>
 
